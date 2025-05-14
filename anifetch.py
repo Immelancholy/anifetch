@@ -205,47 +205,6 @@ HEIGHT = args.height
 # put cached frames here
 frames: list[str] = []
 
-<<<<<<< HEAD
-=======
-# cache is invalid, re-render
-if should_update:
-    print_verbose("SHOULD RENDER WITH CHAFA")
-
-    # delete all old frames
-    shutil.rmtree(BASE_PATH / "video")
-    os.mkdir(BASE_PATH / "video")
-
-    stdout = None if args.verbose else subprocess.DEVNULL
-    stderr = None if args.verbose else subprocess.STDOUT
-
-    if args.chroma_flag_given:
-        subprocess.call(
-            [
-                "ffmpeg",
-                "-i",
-                f"{args.filename}",
-                "-vf",
-                f"fps={args.framerate},format=rgba,chromakey={args.chroma}",
-                str(BASE_PATH / "video/%05d.png"),
-            ],
-            stdout=stdout,
-            stderr=stderr,
-        )
-    else:
-        subprocess.call(
-            [
-                "ffmpeg",
-                "-i",
-                f"{args.filename}",
-                "-vf",
-                f"fps={args.framerate},format=rgba",
-                str(BASE_PATH / "video/%05d.png"),
-            ],
-            stdout=stdout,
-            stderr=stderr,
-        )
->>>>>>> transparent-background
-
 def get_sound():
     print_verbose(args.sound_flag_given)
 
@@ -326,18 +285,32 @@ thread_files = threading.Thread(target=chafa_files, args=(code, ))
 def ffmpeg_process():
     stdout = None if args.verbose else subprocess.DEVNULL
     stderr = None if args.verbose else subprocess.STDOUT
-    ffmpeg = subprocess.Popen(
-        [
-            "ffmpeg",
-            "-i",
-            f"{args.filename}",
-            "-vf",
-            f"fps={args.framerate},format=rgba",
-            str(BASE_PATH / "video/%d.png"),
-        ],
-        stdout=stdout,
-        stderr=stderr,
-    )
+    if args.chroma_flag_given:
+        ffmpeg = subprocess.Popen(
+            [
+                "ffmpeg",
+                "-i",
+                f"{args.filename}",
+                "-vf",
+                f"fps={args.framerate},format=rgba,chromakey={args.chroma}",
+                str(BASE_PATH / "video/%d.png"),
+            ],
+            stdout=stdout,
+            stderr=stderr,
+        )
+    else:
+        ffmpeg = subprocess.Popen(
+            [
+                "ffmpeg",
+                "-i",
+                f"{args.filename}",
+                "-vf",
+                f"fps={args.framerate},format=rgba",
+                str(BASE_PATH / "video/%d.png"),
+            ],
+            stdout=stdout,
+            stderr=stderr,
+        )
     ffmpeg.wait()
     code.append("done")
 
